@@ -9,14 +9,16 @@
  *
  * Date: February 4, 2021
  */
+
 const admin = require("firebase-admin");
 const functions = require("firebase-functions");
 const iot = require("@google-cloud/iot");
 
 admin.initializeApp();
 
-// Reference to root of real-time database in Firebase
+// Reference to databases in Firebase
 const database = admin.database();
+const firestore = admin.firestore();
 
 // Client to interface with Google Cloud IoT devices
 const client = new iot.v1.DeviceManagerClient();
@@ -26,6 +28,8 @@ const GCLOUD_PROJECT = "piponics";
 const REGISTRY_ID = "RaspberryPis";
 const IOT_REGION = "us-central1";
 const IOT_TOPIC = "device-events";
+const STATUS_COLLECTION = "Status";
+const HISTORY_COLLECTION = "History";
 
 /*
  * Function: iotDeviceConfigUpdate
@@ -40,7 +44,7 @@ const IOT_TOPIC = "device-events";
  * database structure.
  */
 exports.iotDeviceConfigUpdate = functions.firestore
-    .document(REGISTRY_ID.concat("/{deviceId}"))
+    .document(STATUS_COLLECTION.concat("/{deviceId}"))
     .onWrite((change, context) => {
       if (context) {
         console.log("Updating device: ", context.params.deviceId);
@@ -76,8 +80,17 @@ exports.iotStoreDeviceUpdates = functions.pubsub
       console.log("Recieved msg from: ", deviceId);
       console.log("Msg data: ", deviceData);
 
+      // Add timestamp to data
+      deviceData.timestamp = admin.firestore.Timestamp.now(),
+
       // Write data to Firebase real-time db
       database.ref(deviceId).set(deviceData);
+
+      // Push the new message into Firestore using the Firebase Admin SDK.
+      firestore.collection(HISTORY_COLLECTION)
+          .doc(deviceId)
+          .collection(HISTORY_COLLECTION)
+          .add(deviceData);
 
       return;
     });
