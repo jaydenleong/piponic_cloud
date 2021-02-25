@@ -92,35 +92,34 @@ exports.iotStoreDeviceUpdates = functions.pubsub
           .collection(HISTORY_COLLECTION)
           .add(deviceData);
 
-      // Create a notification demo if the leak sensor is above a certain value 
-      // TODO(Jayden) Fetch thresholds from database, 
+      // Create a notification demo if the leak sensor is above a certain value
+      // TODO(Jayden) Fetch thresholds from database,
       // programmable by user in notification settings.
       // (deviceId == "CarsonPi" || deviceId == "LynesPi"))
-      if (deviceData.leak > 0.25) 
-      {
-          console.log("Leak Detected on System: ", deviceId);
+      if (deviceData.leak > 0.25 && deviceId == "LynesPi") {
+        console.log("Leak Detected on System: ", deviceId);
 
-          const payload = {
-              notification: {
-                  title: "WARNING: LEAK DETECTED",
-                  body: "Please check your system to avoid damage...",
-                  sound: "default"
-              },
-          };
+        const payload = {
+          notification: {
+            title: "WARNING: LEAK DETECTED",
+            body: "Please check your system to avoid damage...",
+            sound: "default",
+          },
+        };
 
-          //  Create an options object that contains the time to live 
-          //    for the notification and the priority
-          const options = {
-              priority: "high",
-              timeToLive: 60 * 60 * 24
-          };
+        //  Create an options object that contains the time to live
+        //    for the notification and the priority
+        const options = {
+          priority: "high",
+          timeToLive: 60 * 60 * 24,
+        };
 
-          // TODO(Jayden) Keep topic as constant
-          return admin.messaging().sendToTopic("leakNotifications", 
-                                               payload, 
-                                               options);
+        // TODO(Jayden) Keep topic as constant
+        return admin.messaging().sendToTopic("leakNotifications",
+            payload,
+            options);
       }
-  });
+    });
 
 /**
  * Generate request to change Google Cloud IoT Device config
