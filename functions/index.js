@@ -30,6 +30,7 @@ const IOT_REGION = "us-central1";
 const IOT_TOPIC = "device-events";
 const STATUS_COLLECTION = "Status";
 const HISTORY_COLLECTION = "History";
+const CONFIG_COLLECTION = "Config";
 
 /*
  * Function: iotDeviceConfigUpdate
@@ -44,7 +45,7 @@ const HISTORY_COLLECTION = "History";
  * database structure.
  */
 exports.iotDeviceConfigUpdate = functions.firestore
-    .document(STATUS_COLLECTION.concat("/{deviceId}"))
+    .document(CONFIG_COLLECTION.concat("/{deviceId}"))
     .onWrite((change, context) => {
       if (context) {
         console.log("Updating device: ", context.params.deviceId);
@@ -84,7 +85,11 @@ exports.iotStoreDeviceUpdates = functions.pubsub
       deviceData.timestamp = admin.firestore.Timestamp.now(),
 
       // Write data to Firebase real-time db
+      // TODO(Jayden): remove once migrated to Firestore
       database.ref(deviceId).set(deviceData);
+
+      // Update sensor measurements in Firestore
+      firestore.collection(STATUS_COLLECTION).doc(deviceId).update(deviceData);
 
       // Push the new message into Firestore using the Firebase Admin SDK.
       firestore.collection(HISTORY_COLLECTION)
@@ -96,7 +101,8 @@ exports.iotStoreDeviceUpdates = functions.pubsub
       // TODO(Jayden) Fetch thresholds from database,
       // programmable by user in notification settings.
       // (deviceId == "CarsonPi" || deviceId == "LynesPi"))
-      if (deviceData.leak > 0.25 && deviceId == "LynesPi") {
+      /*
+      if (deviceData.leak > 1.5 && deviceId == "LynesPi") {
         console.log("Leak Detected on System: ", deviceId);
 
         const payload = {
@@ -119,6 +125,7 @@ exports.iotStoreDeviceUpdates = functions.pubsub
             payload,
             options);
       }
+      */
     });
 
 /**
