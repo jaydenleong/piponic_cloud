@@ -39,7 +39,7 @@ const TEMP_HIGH_MSG = "TEMPERATURE TOO HIGH...";
 const TEMP_LOW_MSG = "TEMPERATURE TOO LOW...";
 const PH_HIGH_MSG = "PH TOO HIGH...";
 const PH_LOW_MSG = "PH TOO LOW...";
-const BATTERY_LOW_MSG = "TEMPERATURE TOO LOW...";
+const BATTERY_LOW_MSG = "BATTERY TOO LOW..";
 const INTERNAL_LEAK_MSG = "INTERNAL LEAK DETECTED...";
 const LEAK_MSG = "LEAK DETECTED...";
 
@@ -244,7 +244,7 @@ function detectSystemErrors(deviceId, deviceData, configData, errorData) {
         break;
       case "max_ph":
         if ("pH" in deviceData) {
-          if (deviceData.pH > config.max_ph) {
+          if (deviceData.pH > configData.max_ph) {
             console.log("pH too high");
 
             if (!errorData.PH_HIGH) {
