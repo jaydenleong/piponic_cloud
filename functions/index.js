@@ -51,6 +51,7 @@ const DEFAULT_CONFIG_DOC = { // Default system settings
   min_temperature: 15,
   peristaltic_pump_on: false,
   target_ph: 7,
+  update_interval_minutes: 30,
 };
 
 const DEFAULT_ERROR_DOC = { // Default there are no errors
