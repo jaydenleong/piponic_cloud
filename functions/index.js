@@ -21,7 +21,7 @@ const database = admin.database();
 const firestore = admin.firestore();
 
 // Client to interface with Google Cloud IoT devices
-const client = new iot.v1.DeviceManagerClient();
+const iotClient = new iot.v1.DeviceManagerClient();
 
 // Configuration variables
 const GCLOUD_PROJECT = "piponics";
@@ -70,6 +70,33 @@ const MIN_BATTERY_VOLTAGE = 4.0;
 const MAX_LEAK_VOLTAGE = 0.6;
 
 /*
+ * Function: calibratePH
+ *
+ * Sends a pH value to a Raspberry Pi
+ * in order to calibrate the pH probe.
+ *
+ * Use Google Cloud IoT commands to send messages
+ * to devices.
+ */
+exports.calibratePH = functions.https.onCall((data, context) => {
+  // Ensure correct parameters passed to function
+  if ( !("calibrate_ph" in data) || !("device_id" in data) ) {
+    console.log("[ERROR] Invalid parameters to calibrate PH");
+  }
+
+  console.log(data);
+
+  // Create request to send calibration value to device
+  const command = {"calibrate_ph": data.calibrate_ph};
+  const request = generateRequest(data.device_id, command);
+
+  // Send the command to the device
+  iotClient.sendCommandToDevice(request).catch((error) => {
+    console.error(error);
+  });
+});
+
+/*
  * Function: iotDeviceConfigUpdate
  *
  * Listens to updates from Firestore collection,
@@ -89,7 +116,7 @@ exports.iotDeviceConfigUpdate = functions.firestore
         console.log("Configuration value: ", change.after.data());
         const request = generateRequest(context.params.deviceId,
             change.after.data());
-        return client.modifyCloudToDeviceConfig(request);
+        return iotClient.modifyCloudToDeviceConfig(request);
       } else {
         throw (Error("no context from trigger"));
       }
@@ -379,7 +406,7 @@ function sendFCMNotification(topic, title, body) {
  * @return {object} the formatted request to Google Cloud IoT
  */
 function generateRequest(deviceId, configData) {
-  const formattedName = client.devicePath(GCLOUD_PROJECT,
+  const formattedName = iotClient.devicePath(GCLOUD_PROJECT,
       IOT_REGION,
       REGISTRY_ID,
       deviceId);
