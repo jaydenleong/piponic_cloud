@@ -10,7 +10,7 @@
  * Date: February 4, 2021
  */
 
-/* This file is part of the PiPonic project: an IoT Hydroponic and Aquaponic 
+/* This file is part of the PiPonic project: an IoT Hydroponic and Aquaponic
  * monitoring and control system.
  *
  * PiPonic is free software: you can redistribute it and/or modify
@@ -87,26 +87,29 @@ const MIN_BATTERY_VOLTAGE = 4.0;
 const MAX_LEAK_VOLTAGE = 0.6;
 
 /*
- * Function: calibratePH
+ * Function: iotDeviceCommand
  *
- * Sends a pH value to a Raspberry Pi
- * in order to calibrate the pH probe.
+ * Sends a JSON object with data to a device.
  *
  * Use Google Cloud IoT commands to send messages
  * to devices.
  */
-exports.calibratePH = functions.https.onCall((data, context) => {
+exports.iotDeviceCommand = functions.https.onCall((data, context) => {
   // Ensure correct parameters passed to function
-  if ( !("calibrate_ph" in data) || !("device_id" in data) ) {
+  const deviceIdField = "device_id";
+  if ( !(deviceIdField in data) ) {
     console.log("[ERROR] Invalid parameters to calibrate PH");
   }
 
-  // Log the calibration data
-  console.log(data);
+  // Remove device id to avoid sending to device
+  const {[deviceIdField]: deviceId, ...requestData} = data;
+
+  // Log the data we send to the device
+  console.log(deviceId);
+  console.log(requestData);
 
   // Create request to send calibration value to device
-  const command = {"calibrate_ph": data.calibrate_ph};
-  const request = generateRequest(data.device_id, command);
+  const request = generateRequest(data.device_id, requestData);
 
   // Send the command to the device
   iotClient.sendCommandToDevice(request).catch((error) => {
