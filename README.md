@@ -13,12 +13,6 @@ Our work contributes a low-cost, open-source hardware design, and IoT developmen
 
 Our system can also operate on battery power in the event of a power-outage, a critical failure in aquaponic systems. This feature allows growers to be notified and to begin to take corrective action within the minute of the outage.
 
-## System Overview
-
-As you can see, the sensing and control system is attached to the aquaponic/hydroponic installation. Then, users can monitor an control their system remotely.
-
-<img src="docs/systemOverview.png" alt="drawing" width=""/>
-
 ## This Repository
 
 This repository provides Google Firebase functions to connect a mobile application to a sensing and control system on an aquaponic or hydroponic installation. 
@@ -31,6 +25,8 @@ This repository uses the following technologies:
 - [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging): service used to send notifications to the mobile application if there are any errors detected.
 
 ## Related Repositories
+
+<img src="docs/systemOverview.png" alt="drawing" width="600"/>
 
 - [piponic](https://github.com/jaydenleong/piponic): A sensing and control system for aquaponics or hydroponics. Runs on a Raspberry Pi and connects to the mobile application using this repository.
 - [piponic_app](https://github.com/jaydenleong/piponic_app): The mobile application for users to remotely monitor and control their aqua/hydroponic installation. Implemented using Google's Flutter.
