@@ -13,6 +13,12 @@ Our work contributes a low-cost, open-source hardware design, and IoT developmen
 
 Our system can also operate on battery power in the event of a power-outage, a critical failure in aquaponic systems. This feature allows growers to be notified and to begin to take corrective action within the minute of the outage.
 
+## System Overview
+
+As you can see, the sensing and control system is attached to the aquaponic/hydroponic installation. Then, users can monitor an control their system remotely.
+
+<img src="docs/systemOverview.png" alt="drawing" width=""/>
+
 ## This Repository
 
 This repository provides Google Firebase functions to connect a mobile application to a sensing and control system on an aquaponic or hydroponic installation. 
