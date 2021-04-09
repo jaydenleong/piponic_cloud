@@ -18,7 +18,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Foobar is distributed in the hope that it will be useful,
+ * PiPonic is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -33,8 +33,7 @@ const iot = require("@google-cloud/iot");
 
 admin.initializeApp();
 
-// Reference to databases in Firebase
-const database = admin.database();
+// Reference Firestore database
 const firestore = admin.firestore();
 
 // Client to interface with Google Cloud IoT devices
@@ -66,7 +65,6 @@ const DEFAULT_CONFIG_DOC = { // Default system settings
   min_ph: 5,
   max_temperature: 25,
   min_temperature: 15,
-  peristaltic_pump_on: false,
   target_ph: 7,
   update_interval_minutes: 30,
 };
@@ -83,8 +81,8 @@ const DEFAULT_ERROR_DOC = { // Default there are no errors
 };
 
 // Default Error values. Send errors if thresholds not maintained
-const MIN_BATTERY_VOLTAGE = 4.0;
-const MAX_LEAK_VOLTAGE = 0.6;
+const MIN_BATTERY_VOLTAGE = 1.0;
+const MAX_LEAK_VOLTAGE = 0.25;
 
 /*
  * Function: iotDeviceCommand
@@ -147,7 +145,7 @@ exports.iotDeviceConfigUpdate = functions.firestore
  * Function: iotStoreDeviceUpdates
  *
  * Subscribes to IoT device updates in Google Pub-Sub,
- * then saves this to Firebase real-time database.
+ * then saves this to Firestore.
  * The mobile app pulls device status from this
  * real-time database.
  *
@@ -167,11 +165,7 @@ exports.iotStoreDeviceUpdates = functions.pubsub
       console.log("Msg data: ", deviceData);
 
       // Add timestamp to data
-      deviceData.timestamp = admin.firestore.Timestamp.now(),
-
-      // Write data to Firebase real-time db
-      // TODO(Jayden): remove once migrated to Firestore
-      database.ref(deviceId).set(deviceData);
+      deviceData.timestamp = admin.firestore.Timestamp.now();
 
       // Update sensor measurements in Firestore
       firestore.collection(STATUS_COLLECTION).doc(deviceId).set(deviceData);
